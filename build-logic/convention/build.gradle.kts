@@ -36,9 +36,25 @@ gradlePlugin {
             id = libs.plugins.libroom.android.application.get().pluginId
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("androidApplicationCompose") {
+            id = libs.plugins.libroom.android.app.compose.get().pluginId
+            implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+        register("androidLibraryCompose") {
+            id = libs.plugins.libroom.android.lib.compose.get().pluginId
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
         register("androidLibrary") {
             id = libs.plugins.libroom.android.library.get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidFeature") {
+            id = libs.plugins.libroom.android.feature.get().pluginId
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
+        register("jvmLibrary") {
+            id = libs.plugins.libroom.jvm.library.get().pluginId
+            implementationClass = "JvmLibraryConventionPlugin"
         }
         register("hilt") {
             id = libs.plugins.libroom.hilt.get().pluginId

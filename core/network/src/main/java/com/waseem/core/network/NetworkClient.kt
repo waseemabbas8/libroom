@@ -12,8 +12,11 @@ import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.plugins.resources.put
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.DEFAULT_PORT
 import io.ktor.http.URLProtocol
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -59,7 +62,12 @@ class NetworkClient(
 
     suspend inline fun <reified Resource: Any, reified ResponseType: Any> post(
         resource: Resource,
-        builder: HttpRequestBuilder.() -> Unit = {}
+        requestBody: Any? = null,
+        contentType: ContentType = ContentType.Application.Json,
+        builder: HttpRequestBuilder.() -> Unit = {
+            contentType(contentType)
+            requestBody?.let { setBody(it) }
+        }
     ): ResponseType {
         val response = client.post(resource = resource, builder = builder)
         return response.body<ResponseType>()

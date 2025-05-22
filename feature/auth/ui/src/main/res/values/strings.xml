@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_screen_title">Login to your Account</string>
+    <string name="hint_email">your@email.com</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="login_success">Login Success</string>
+    <string name="retry_login">Retry Login</string>
+    <string name="forgot_password">Forget Password?</string>
+</resources>
