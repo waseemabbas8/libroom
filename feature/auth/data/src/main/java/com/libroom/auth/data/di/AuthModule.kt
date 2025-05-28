@@ -1,8 +1,9 @@
 package com.libroom.auth.data.di
 
-import com.libroom.auth.data.AuthRepositoryImpl
+import com.libroom.auth.data.DefaultRepository
 import com.libroom.auth.domain.AuthRepository
-import com.waseem.core.network.NetworkClient
+import com.libroom.auth.domain.LoginUseCase
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,10 +11,18 @@ import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
-internal object AuthModule {
+internal abstract class AuthModule {
 
-    @Provides
-    fun provideAuthRepository(
-        networkClient: NetworkClient
-    ): AuthRepository = AuthRepositoryImpl(networkClient = networkClient)
+    @Binds
+    abstract fun bindAuthRepository(
+        impl: DefaultRepository
+    ): AuthRepository
+
+    companion object {
+
+        @Provides
+        fun provideLoginUseCase(
+            authRepository: AuthRepository
+        ) = LoginUseCase(authRepository = authRepository)
+    }
 }

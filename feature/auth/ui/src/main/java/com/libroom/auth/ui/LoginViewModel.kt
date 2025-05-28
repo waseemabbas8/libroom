@@ -22,7 +22,9 @@ internal class LoginViewModel @Inject constructor(
                 login(email = email, password = password).onSuccess {
                     emit(LoginResult.Success)
                 }.onFailure { throw it }
-            }.catch { emit(LoginEvent.ShowToast(it.message ?: "")) }
+            }.catch {
+                emit(LoginEvent.ShowToast(it.message ?: ""))
+            }
         }
     }
 }

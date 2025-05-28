@@ -1,5 +1,6 @@
 package com.libroom.auth.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -27,12 +29,19 @@ import com.libroom.core.ui.FilledButton
 import com.libroom.core.ui.ProgressDialog
 import com.libroom.core.ui.ScreenPreview
 import com.libroom.core.ui.SpacerVertical
+import com.waseem.mvi.collectEvents
 import com.waseem.mvi.collectState
 
 @Composable
 internal fun LoginRoute(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    viewModel.collectEvents {
+        when (it) {
+            is LoginEvent.ShowToast -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        }
+    }
     val state by viewModel.collectState()
     LoginScreen(
         state = state,
@@ -46,7 +55,8 @@ internal fun LoginScreen(
     onAction: (LoginAction) -> Unit = { }
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(32.dp)
     ) {
         CircledLogo()

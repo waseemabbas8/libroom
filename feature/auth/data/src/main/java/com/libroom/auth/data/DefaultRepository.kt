@@ -3,8 +3,9 @@ package com.libroom.auth.data
 import com.libroom.auth.domain.AuthRepository
 import com.libroom.core.data.api.UserDto
 import com.waseem.core.network.NetworkClient
+import javax.inject.Inject
 
-class AuthRepositoryImpl(
+internal class DefaultRepository @Inject constructor(
     private val networkClient: NetworkClient
 ) : AuthRepository {
     override suspend fun login(email: String, password: String) {

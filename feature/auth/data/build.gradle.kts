@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.libroom.android.library)
     alias(libs.plugins.libroom.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {

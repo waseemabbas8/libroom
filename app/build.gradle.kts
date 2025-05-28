@@ -29,6 +29,7 @@ android {
 dependencies {
     implementation(projects.libroom.core.ui)
     implementation(projects.libroom.feature.auth.ui)
+    implementation(projects.libroom.feature.auth.data) //Adding this to make hilt work with transitive dependencies
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

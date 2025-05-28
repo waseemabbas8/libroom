@@ -1,8 +1,11 @@
 package com.waseem.core.network
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -17,6 +20,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.DEFAULT_PORT
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -25,9 +29,20 @@ class NetworkClient(
     server: Server
 ) {
     val client = HttpClient(Android) {
-
+        expectSuccess = true
+        HttpResponseValidator {
+            handleResponseExceptionWithRequest { exception, _ ->
+                Log.e(NetworkClient::class.simpleName, "Error: $exception")
+                when(exception) {
+                    is ClientRequestException -> {
+                        val errorBody = exception.response.body<RequestErrorBody>()
+                        throw Exception(errorBody.message)
+                    }
+                }
+            }
+        }
         install(HttpTimeout) {
-            val timeout = 300000L
+            val timeout = 30000L
             requestTimeoutMillis = timeout
             connectTimeoutMillis = timeout
             socketTimeoutMillis = timeout
@@ -56,7 +71,6 @@ class NetworkClient(
         builder: HttpRequestBuilder.() -> Unit = {}
     ): ResponseType {
         val response = client.get(resource = resource, builder = builder)
-        // TODO: handle errors like 401
         return response.body<ResponseType>()
     }
 
@@ -70,7 +84,10 @@ class NetworkClient(
         }
     ): ResponseType {
         val response = client.post(resource = resource, builder = builder)
-        return response.body<ResponseType>()
+        if (response.status.isSuccess()) {
+            return response.body<ResponseType>()
+        }
+        throw Exception(response.body<String>())
     }
 
     suspend inline fun <reified Resource: Any, reified ResponseType: Any> put(
