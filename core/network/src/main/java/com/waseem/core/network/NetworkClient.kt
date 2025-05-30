@@ -7,8 +7,16 @@ import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.ANDROID
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.plugins.resources.delete
 import io.ktor.client.plugins.resources.get
@@ -16,6 +24,7 @@ import io.ktor.client.plugins.resources.post
 import io.ktor.client.plugins.resources.put
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.DEFAULT_PORT
 import io.ktor.http.URLProtocol
@@ -23,6 +32,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlin.math.log
 
 
 class NetworkClient(
@@ -31,15 +41,25 @@ class NetworkClient(
     val client = HttpClient(Android) {
         expectSuccess = true
         HttpResponseValidator {
-            handleResponseExceptionWithRequest { exception, _ ->
-                Log.e(NetworkClient::class.simpleName, "Error: $exception")
+            handleResponseException { exception, _ ->
                 when(exception) {
-                    is ClientRequestException -> {
-                        val errorBody = exception.response.body<RequestErrorBody>()
-                        throw Exception(errorBody.message)
+                    is ClientRequestException, is ServerResponseException -> {
+                        val errorBody = try {
+                            exception.response.body<RequestErrorBody>()
+                        } catch (e: Exception) {
+                            Log.e("NetworkClient", "Failed to parse error body $e")
+                            null
+                        }
+                        val errorMessage = errorBody?.message ?: ""
+                        throw Exception(errorMessage, exception)
                     }
+                    else -> throw exception
                 }
             }
+        }
+        install(Logging) {
+            logger = Logger.ANDROID
+            level = LogLevel.BODY
         }
         install(HttpTimeout) {
             val timeout = 30000L
@@ -51,6 +71,7 @@ class NetworkClient(
             json(
                 Json {
                     prettyPrint = true
+                    //ignoreUnknownKeys = true
                 }
             )
         }
@@ -87,7 +108,7 @@ class NetworkClient(
         if (response.status.isSuccess()) {
             return response.body<ResponseType>()
         }
-        throw Exception(response.body<String>())
+        throw ResponseException(response, response.bodyAsText())
     }
 
     suspend inline fun <reified Resource: Any, reified ResponseType: Any> put(
