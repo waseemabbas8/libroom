@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,8 +23,10 @@ internal class LoginViewModel @Inject constructor(
                 login(email = email, password = password).onSuccess {
                     emit(LoginResult.Success)
                 }.onFailure { throw it }
+            }.onStart {
+                emit(LoginResult.Loading)
             }.catch {
-                emit(LoginEvent.ShowToast(it.message ?: ""))
+                emit(LoginResult.Failure(it.message ?: ""))
             }
         }
     }
