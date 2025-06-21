@@ -10,6 +10,7 @@ import javax.inject.Inject
 internal sealed interface LoginUiState : MviViewState {
     data object Default : LoginUiState
     data object Loading : LoginUiState
+    data class Error(val message: String) : LoginUiState
 }
 
 internal sealed interface LoginAction : MviAction {
@@ -19,18 +20,17 @@ internal sealed interface LoginAction : MviAction {
 internal sealed interface LoginResult : MviResult {
     data object Loading : LoginResult
     data object Success : LoginResult
+    data class Failure(val message: String) : LoginResult
 }
 
-internal sealed interface LoginEvent : LoginResult, MviEvent {
-    data class ShowToast(val message: String) : LoginEvent
-}
+internal sealed interface LoginEvent : MviEvent
 
 internal class LoginStateReducer @Inject constructor() : MviStateReducer<LoginUiState, LoginResult> {
     override fun LoginUiState.reduce(result: LoginResult): LoginUiState {
         return when (result) {
             LoginResult.Loading -> LoginUiState.Loading
             LoginResult.Success -> LoginUiState.Default
-            else -> this
+            is LoginResult.Failure -> LoginUiState.Error(result.message)
         }
     }
 }
