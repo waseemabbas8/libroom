@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.libroom.core.ui.CircledLogo
 import com.libroom.core.ui.EditText
 import com.libroom.core.ui.FilledButton
 import com.libroom.core.ui.ProgressDialog
