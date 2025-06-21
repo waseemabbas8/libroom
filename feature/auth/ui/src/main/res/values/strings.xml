@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="login_screen_title">Login to your Account</string>
+    <string name="login_screen_title">Let\'s you in</string>
+    <string name="login_screen_subtitle">Time to unwind with a good book</string>
     <string name="hint_email">your@email.com</string>
     <string name="password">Password</string>
     <string name="login">Login</string>

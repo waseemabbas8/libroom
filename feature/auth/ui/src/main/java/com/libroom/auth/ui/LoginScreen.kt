@@ -9,9 +9,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -57,17 +58,24 @@ internal fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp)
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CircledLogo()
         SpacerVertical(100)
+        CircledLogo()
+        SpacerVertical(20)
         Text(
             text = stringResource(R.string.login_screen_title),
-            style = MaterialTheme.typography.titleLarge.copy(
+            style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.SemiBold
             ),
         )
-        SpacerVertical(20)
+        SpacerVertical(8)
+        Text(
+            text = stringResource(R.string.login_screen_subtitle),
+            style = MaterialTheme.typography.labelMedium
+        )
+        SpacerVertical(30)
         LoginForm(onAction = onAction)
     }
 
